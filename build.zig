@@ -2,7 +2,7 @@ const std = @import("std");
 
 pub fn build(b: *std.Build) void {
     const build_exe = b.option(bool, "build-example", "Build the zig-prompter example") orelse true;
-    const build_lib = b.option(bool, "build-lib", "Build zig-prompter as a static library") orelse true;
+    const build_lib = b.option(bool, "build-lib", "Build zig-prompter as a static library") orelse false;
 
     const target = b.standardTargetOptions(.{});
     const optimize = b.standardOptimizeOption(.{});
