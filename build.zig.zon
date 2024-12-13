@@ -10,13 +10,16 @@
     // with this value.
     //.minimum_zig_version = "0.11.0",
 
-    .dependencies = .{},
+    .dependencies = .{ .mibu = .{
+        .url = "https://github.com/xyaman/mibu/archive/refs/heads/main.zip",
+        .hash = "12205e93ed17ab3081a9d5289c2665e67873501f069a6210e02f3d8178a0c6e3156a",
+    } },
 
     .paths = .{
         "build.zig",
         "build.zig.zon",
         "src",
-        //"LICENSE",
-        //"README.md",
+        "LICENSE",
+        "README.md",
     },
 }

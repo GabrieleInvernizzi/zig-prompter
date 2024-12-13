@@ -2,25 +2,20 @@ const std = @import("std");
 
 pub fn build(b: *std.Build) void {
     const build_exe = b.option(bool, "build-example", "Build the zig-prompter example") orelse true;
-    const build_lib = b.option(bool, "build-lib", "Build zig-prompter as a static library") orelse false;
 
     const target = b.standardTargetOptions(.{});
     const optimize = b.standardOptimizeOption(.{});
 
+    // Dependencies
+    const mibu_dep = b.dependency("mibu", .{
+        .target = target,
+        .optimize = optimize,
+    });
+
     const zig_prompter_module = b.addModule("prompter", .{
         .root_source_file = b.path("src/root.zig"),
     });
-
-    if (build_lib) {
-        const lib = b.addStaticLibrary(.{
-            .name = "prompter",
-            .root_source_file = b.path("src/root.zig"),
-            .target = target,
-            .optimize = optimize,
-        });
-
-        b.installArtifact(lib);
-    }
+    zig_prompter_module.addImport("mibu", mibu_dep.module("mibu"));
 
     if (build_exe) {
         const exe = b.addExecutable(.{
