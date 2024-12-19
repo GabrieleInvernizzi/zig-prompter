@@ -11,6 +11,17 @@ fn is_string_empty(str: []const u8) bool {
     return true;
 }
 
+pub const PromptTheme = struct {
+    prefix: []const u8,
+    infix: []const u8,
+    option_aborted_msg: []const u8,
+    max_input_size: usize,
+
+    pub fn default() PromptTheme {
+        return PromptTheme{ .prefix = "", .infix = ">", .option_aborted_msg = "Selection aborted", .max_input_size = 1024 };
+    }
+};
+
 pub const Prompt = struct {
     const Self = @This();
 
@@ -18,10 +29,10 @@ pub const Prompt = struct {
     pub const ValidatorFn = fn ([]const u8) bool;
 
     allocator: Allocator,
-    max_input_size: usize = 1024,
+    theme: PromptTheme,
 
-    pub fn init(alloc: Allocator) Self {
-        return Prompt{ .allocator = alloc };
+    pub fn init(allocator: Allocator, theme: PromptTheme) Self {
+        return Prompt{ .allocator = allocator, .theme = theme };
     }
 
     pub fn string(self: *Self, prompt: []const u8, default: ?[]const u8) ![]const u8 {
@@ -29,15 +40,15 @@ pub const Prompt = struct {
         const stdin = std.io.getStdIn().reader();
 
         if (default) |def| {
-            try stdout.writer().print("{s} ({s}) > ", .{ prompt, def });
+            try stdout.writer().print("{s}{s} ({s}) {s} ", .{ self.theme.prefix, prompt, def, self.theme.infix });
         } else {
-            try stdout.writer().print("{s} > ", .{prompt});
+            try stdout.writer().print("{s}{s} {s} ", .{ self.theme.prefix, prompt, self.theme.infix });
         }
 
         var buf = std.ArrayList(u8).init(self.allocator);
         const writer = buf.writer();
 
-        try stdin.streamUntilDelimiter(writer, '\n', self.max_input_size);
+        try stdin.streamUntilDelimiter(writer, '\n', self.theme.max_input_size);
 
         var input: []u8 = try buf.toOwnedSlice();
         if (@import("builtin").os.tag == .windows) {
@@ -71,8 +82,6 @@ pub const Prompt = struct {
     }
 
     pub fn option(self: *Self, prompt: []const u8, opts: []const []const u8, default: ?usize) !?usize {
-        _ = self;
-
         const stdin = std.io.getStdIn();
         const stdout = std.io.getStdOut();
         const stdout_wrt = stdout.writer();
@@ -90,7 +99,7 @@ pub const Prompt = struct {
         } else {
             selected_opt = 0;
         }
-        try stdout_wrt.print("{s} > \n", .{prompt});
+        try stdout_wrt.print("{s}{s} {s} \n", .{ self.theme.prefix, prompt, self.theme.infix });
 
         try mibu.cursor.hide(stdout_wrt);
 
@@ -130,9 +139,9 @@ pub const Prompt = struct {
         try mibu.cursor.show(stdout_wrt);
 
         if (selected_opt) |o| {
-            try stdout_wrt.print("\r{s} > {s}\n\r", .{ prompt, opts[o] });
+            try stdout_wrt.print("\r{s}{s} {s} {s}\n\r", .{ self.theme.prefix, prompt, self.theme.infix, opts[o] });
         } else {
-            try stdout_wrt.print("\r{s} > Selection aborted.\n\r", .{prompt});
+            try stdout_wrt.print("\r{s}{s} {s} {s}\n\r", .{ self.theme.prefix, prompt, self.theme.infix, self.theme.option_aborted_msg });
         }
 
         return selected_opt;

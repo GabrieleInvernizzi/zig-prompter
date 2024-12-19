@@ -1,5 +1,5 @@
 const std = @import("std");
-const Prompt = @import("prompter").Prompt;
+const Prompter = @import("prompter");
 
 fn three_len_val(str: []const u8) bool {
     return str.len == 3;
@@ -10,7 +10,7 @@ pub fn main() !void {
     const allocator = gpa.allocator();
     const stdout_w = std.io.getStdOut().writer();
 
-    var p = Prompt.init(allocator);
+    var p = Prompter.Prompt.init(allocator, Prompter.PromptTheme.default());
 
     const opts = [_][]const u8{ "Option 1", "Option 2", "Option 3" };
     const sel_opt = try p.option("Select an option", &opts, 1);
