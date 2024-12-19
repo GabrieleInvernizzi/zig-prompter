@@ -14,7 +14,11 @@ pub fn main() !void {
 
     const opts = [_][]const u8{ "Option 1", "Option 2", "Option 3" };
     const sel_opt = try p.option("Select an option", &opts, 1);
-    try stdout_w.print("\nThe selected option was: {s} (idx: {d})\n", .{ opts[sel_opt], sel_opt });
+    if (sel_opt) |o| {
+        try stdout_w.print("\nThe selected option was: {s} (idx: {d})\n", .{ opts[o], o });
+    } else {
+        try stdout_w.writeAll("\nThe selection was aborted.\n");
+    }
 
     const input_1 = try p.string("Write something", "Default");
     defer allocator.free(input_1);

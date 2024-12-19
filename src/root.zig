@@ -71,7 +71,7 @@ pub const Prompt = struct {
         }
     }
 
-    pub fn option(self: *Self, prompt: []const u8, opts: []const []const u8, default: ?usize) !usize {
+    pub fn option(self: *Self, prompt: []const u8, opts: []const []const u8, default: ?usize) !?usize {
         _ = self;
 
         const stdin = std.io.getStdIn();
@@ -82,7 +82,7 @@ pub const Prompt = struct {
         var raw_term = try mibu.term.enableRawMode(stdin.handle);
         defer raw_term.disableRawMode() catch {};
 
-        var selected_opt: usize = undefined;
+        var selected_opt: ?usize = undefined;
         if (default) |d| {
             if (d >= opts.len) {
                 return PromptError.DefaultNotInOptions;
@@ -107,14 +107,17 @@ pub const Prompt = struct {
             switch (next) {
                 .key => |k| switch (k) {
                     .ctrl => |c| switch (c) {
-                        'c' => break,
+                        'c' => {
+                            selected_opt = null;
+                            break;
+                        },
                         else => continue,
                     },
-                    .down => if (selected_opt < (opts.len - 1)) {
-                        selected_opt += 1;
+                    .down => if (selected_opt.? < (opts.len - 1)) {
+                        selected_opt.? += 1;
                     },
-                    .up => if (selected_opt > 0) {
-                        selected_opt -= 1;
+                    .up => if (selected_opt.? > 0) {
+                        selected_opt.? -= 1;
                     },
                     .enter => break,
                     else => continue,
@@ -126,7 +129,12 @@ pub const Prompt = struct {
         try mibu.cursor.goUp(stdout_wrt, 1);
         try mibu.clear.screenFromCursor(stdout_wrt);
         try mibu.cursor.show(stdout_wrt);
-        try stdout_wrt.print("\r{s} > {s}\n\r", .{ prompt, opts[selected_opt] });
+
+        if (selected_opt) |o| {
+            try stdout_wrt.print("\r{s} > {s}\n\r", .{ prompt, opts[o] });
+        } else {
+            try stdout_wrt.print("\r{s} > Selection aborted.\n\r", .{prompt});
+        }
 
         return selected_opt;
     }
