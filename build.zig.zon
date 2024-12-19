@@ -10,11 +10,12 @@
     // with this value.
     //.minimum_zig_version = "0.11.0",
 
-    .dependencies = .{ .mibu = .{
-        .url = "https://github.com/xyaman/mibu/archive/refs/heads/main.zip",
-        .hash = "12205e93ed17ab3081a9d5289c2665e67873501f069a6210e02f3d8178a0c6e3156a",
-    } },
-
+    .dependencies = .{
+        .mibu = .{
+            .url = "git+https://github.com/xyaman/mibu#b001662c929e2719ee24be585a3120640f946337",
+            .hash = "1220d78664322b50e31a99cfb004b6fa60c43098d95abf7ec60a21ebeaf1c914edaf",
+        },
+    },
     .paths = .{
         "build.zig",
         "build.zig.zon",
