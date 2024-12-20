@@ -33,16 +33,16 @@ pub fn main() !void {
     // Try out the string prompt
     {
         try out.writeAll("\n[ String Prompt ]\n");
-        const input_1 = try p.string("Write something", "Default");
-        defer allocator.free(input_1);
-        try out.print("The input was: {s}\n", .{input_1});
+        const input = try p.string("Write something", "Default");
+        defer allocator.free(input);
+        try out.print("The input was: {s}\n", .{input});
     }
 
     // Try out the string prompt with validation (using the function defined above (len_three_val))
     {
         try out.writeAll("\n[ Validated String Prompt ]\n");
-        const input_2 = try p.stringValidated("Write a string with length = 3", null, len_three_val);
-        defer allocator.free(input_2);
-        try out.print("The input was: {s}\n", .{input_2});
+        const input = try p.stringValidated("Write a string with length = 3", null, len_three_val);
+        defer allocator.free(input);
+        try out.print("The input was: {s}\n", .{input});
     }
 }
