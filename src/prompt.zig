@@ -36,46 +36,46 @@ pub const Prompt = struct {
     }
 
     pub fn string(self: *Self, prompt: []const u8, default: ?[]const u8) ![]const u8 {
-        const stdout = std.io.getStdOut();
-        const stdin = std.io.getStdIn().reader();
+        const out = std.io.getStdOut().writer();
+        const in = std.io.getStdIn().reader();
 
         if (default) |def| {
-            try stdout.writer().print("{s}{s} ({s}) {s} ", .{ self.theme.prefix, prompt, def, self.theme.infix });
+            try out.print("{s}{s} ({s}) {s} ", .{ self.theme.prefix, prompt, def, self.theme.infix });
         } else {
-            try stdout.writer().print("{s}{s} {s} ", .{ self.theme.prefix, prompt, self.theme.infix });
+            try out.print("{s}{s} {s} ", .{ self.theme.prefix, prompt, self.theme.infix });
         }
 
         var buf = std.ArrayList(u8).init(self.allocator);
-        const writer = buf.writer();
+        const buf_writer = buf.writer();
 
-        try stdin.streamUntilDelimiter(writer, '\n', self.theme.max_input_size);
+        try in.streamUntilDelimiter(buf_writer, '\n', self.theme.max_input_size);
 
         var input: []u8 = try buf.toOwnedSlice();
         if (@import("builtin").os.tag == .windows) {
             input = std.mem.trimRight(u8, input, "\r");
         }
 
-        const out = input;
+        const ret = input;
 
-        if (is_string_empty(out) and default != null) {
+        if (is_string_empty(ret) and default != null) {
             buf.deinit();
             var out_buf = std.ArrayList(u8).init(self.allocator);
             try out_buf.appendSlice(default.?);
             return try out_buf.toOwnedSlice();
         } else {
-            return std.mem.trim(u8, out, &std.ascii.whitespace);
+            return std.mem.trim(u8, ret, &std.ascii.whitespace);
         }
     }
 
     pub fn stringValidated(self: *Self, prompt: []const u8, default: ?[]const u8, validator: ValidatorFn) ![]const u8 {
-        const stdout_w = std.io.getStdOut().writer();
+        const out = std.io.getStdOut().writer();
 
         while (true) {
             const str = try self.string(prompt, default);
             if (validator(str)) {
                 return str;
             } else {
-                try stdout_w.print("The string: \"{s}\" is invalid. Try again.\n", .{str});
+                try out.print("The string: \"{s}\" is invalid. Try again.\n", .{str});
                 self.allocator.free(str);
             }
         }
@@ -83,8 +83,7 @@ pub const Prompt = struct {
 
     pub fn option(self: *Self, prompt: []const u8, opts: []const []const u8, default: ?usize) !?usize {
         const stdin = std.io.getStdIn();
-        const stdout = std.io.getStdOut();
-        const stdout_wrt = stdout.writer();
+        const out = std.io.getStdOut().writer();
 
         // Enable terminal raw mode, its very recommended when listening for events
         var raw_term = try mibu.term.enableRawMode(stdin.handle);
@@ -99,17 +98,17 @@ pub const Prompt = struct {
         } else {
             selected_opt = 0;
         }
-        try stdout_wrt.print("{s}{s} {s} \n", .{ self.theme.prefix, prompt, self.theme.infix });
+        try out.print("{s}{s} {s} \n", .{ self.theme.prefix, prompt, self.theme.infix });
 
-        try mibu.cursor.hide(stdout_wrt);
+        try mibu.cursor.hide(out);
 
         while (true) {
             for (opts, 0..) |o, i| {
-                try mibu.clear.entire_line(stdout_wrt);
-                const c: u8 = if (i == selected_opt) '*' else ' ';
-                try stdout_wrt.print("\r[{c}] {s}\n", .{ c, o });
+                try mibu.clear.entire_line(out);
+                const c: u8 = if (i == selected_opt) 'X' else ' ';
+                try out.print("\r[{c}] {s}\n", .{ c, o });
             }
-            try mibu.cursor.goUp(stdout_wrt, opts.len);
+            try mibu.cursor.goUp(out, opts.len);
 
             const next = try mibu.events.next(stdin);
             switch (next) {
@@ -134,14 +133,14 @@ pub const Prompt = struct {
             }
         }
 
-        try mibu.cursor.goUp(stdout_wrt, 1);
-        try mibu.clear.screenFromCursor(stdout_wrt);
-        try mibu.cursor.show(stdout_wrt);
+        try mibu.cursor.goUp(out, 1);
+        try mibu.clear.screenFromCursor(out);
+        try mibu.cursor.show(out);
 
         if (selected_opt) |o| {
-            try stdout_wrt.print("\r{s}{s} {s} {s}\n\r", .{ self.theme.prefix, prompt, self.theme.infix, opts[o] });
+            try out.print("\r{s}{s} {s} {s}\n\r", .{ self.theme.prefix, prompt, self.theme.infix, opts[o] });
         } else {
-            try stdout_wrt.print("\r{s}{s} {s} {s}\n\r", .{ self.theme.prefix, prompt, self.theme.infix, self.theme.option_aborted_msg });
+            try out.print("\r{s}{s} {s} {s}\n\r", .{ self.theme.prefix, prompt, self.theme.infix, self.theme.option_aborted_msg });
         }
 
         return selected_opt;
