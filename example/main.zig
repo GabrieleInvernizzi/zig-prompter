@@ -45,4 +45,15 @@ pub fn main() !void {
         defer allocator.free(input);
         try out.print("The input was: {s}\n", .{input});
     }
+
+    // Try out the confimation prompt
+    {
+        try out.writeAll("\n[ Confirmation Prompt ]\n");
+        const has_confirmed = try p.confirm("Please confirm or not [y/n]");
+        if (has_confirmed) {
+            try out.writeAll("The confirmation has a value of \"true\"\n");
+        } else {
+            try out.writeAll("The confirmation has a value of \"false\"\n");
+        }
+    }
 }
