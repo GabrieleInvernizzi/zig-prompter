@@ -2,8 +2,6 @@
 
 **zig-prompter** is a lightweight and flexible library for building and managing interactive text-based prompts in the [Zig programming language](https://ziglang.org/). Whether you're creating command-line tools, text-based games, or utilities requiring user input, `zig-prompter` simplifies the process with intuitive APIs and a robust feature set.
 
-For now the project is in its early stages, still contributions are very welcome.
-
 ## Installation
 
 First, add zig-prompter to your `build.zig.zon` file:
@@ -43,3 +41,21 @@ pub fn main() !void {
     }
 }
 ```
+
+For a more exhaustive example, take a look at the [example](https://github.com/GabrieleInvernizzi/zig-prompter/tree/main/example) directory.
+
+## Features
+- [x] String prompt
+- [x] Interactive option selection prompt
+- [x] Confirmation prompt
+- [x] Input validation
+- [ ] Advanced support for themes and personalization
+- [ ] Windows support
+
+## Contributions
+For now the project is in its early stages, still contributions are always welcome and greatly appreciated! Whether it's fixing bugs, adding features, improving documentation, or enhancing examples, your input helps make **zig-prompter** even better. Feel free to open issues to discuss potential improvements or submit pull requests directly.
+
+Thank you for your support!
+
+## Acknowledgments  
+This library was inspired by the fantastic **Rust** library [Dialoguer](https://github.com/mitsuhiko/dialoguer).
