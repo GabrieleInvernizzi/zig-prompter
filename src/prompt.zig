@@ -1,4 +1,5 @@
 const std = @import("std");
+const PromptTheme = @import("promptTheme.zig").PromptTheme;
 const mibu = @import("mibu");
 
 const Allocator = std.mem.Allocator;
@@ -37,17 +38,6 @@ fn parse_confirmation(str: []const u8) error{NotConfStr}!bool {
 
     return error.NotConfStr;
 }
-
-pub const PromptTheme = struct {
-    prefix: []const u8,
-    infix: []const u8,
-    option_aborted_msg: []const u8,
-    max_input_size: usize,
-
-    pub fn default() PromptTheme {
-        return PromptTheme{ .prefix = "", .infix = ">", .option_aborted_msg = "Selection aborted", .max_input_size = 1024 };
-    }
-};
 
 pub const Prompt = struct {
     const Self = @This();
@@ -114,7 +104,7 @@ pub const Prompt = struct {
         while (true) {
             const str = try self.string(prompt, null);
             const ret = parse_confirmation(str) catch {
-                try out.writeAll("The only valid values are: y/yes and n/no, case insensitive.\n");
+                try out.print("{s}\n", .{self.theme.confirm_invalid_msg});
                 self.allocator.free(str);
                 continue;
             };
