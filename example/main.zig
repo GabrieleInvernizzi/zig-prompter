@@ -16,7 +16,7 @@ pub fn main() !void {
     const out = std.io.getStdOut().writer();
 
     // Initialize the Prompt struct with the default theme
-    var p = Prompter.Prompt.init(allocator, Prompter.PromptTheme.default());
+    var p = Prompter.Prompt.init(allocator, Prompter.PromptTheme{});
 
     // Try out the option selection prompt
     {

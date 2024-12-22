@@ -164,15 +164,19 @@ pub const Prompt = struct {
                         if (read_count < buf.len) {
                             buf[read_count] = c_u8;
                             read_count += 1;
-                            try out.writeAll("*");
+                            if (self.theme.passwd_print_indicator) {
+                                try out.writeAll(&[_]u8{self.theme.passwd_indicator});
+                            }
                         }
                     },
                     .backspace => {
                         if (read_count > 0) {
                             read_count -= 1;
-                            try mibu.cursor.goLeft(out, 1);
-                            try out.writeAll(" ");
-                            try mibu.cursor.goLeft(out, 1);
+                            if (self.theme.passwd_print_indicator) {
+                                try mibu.cursor.goLeft(out, 1);
+                                try out.writeAll(" ");
+                                try mibu.cursor.goLeft(out, 1);
+                            }
                         }
                     },
                     .ctrl => |c| switch (c) {
