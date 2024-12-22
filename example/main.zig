@@ -56,4 +56,16 @@ pub fn main() !void {
             try out.writeAll("The confirmation has a value of \"false\"\n");
         }
     }
+
+    // Try out the password prompt
+    {
+        try out.writeAll("\n[ Password Prompt ]\n");
+        var pass_buf: [64]u8 = undefined;
+        const pass = try p.password("Insert a dummy password", &pass_buf);
+        if (pass) |pw| {
+            try out.print("The password inserted was: \"{s}\"\n", .{pw});
+        } else {
+            try out.writeAll("The insertion of the password was aborted.\n");
+        }
+    }
 }

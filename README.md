@@ -48,6 +48,7 @@ For a more exhaustive example, take a look at the [example](https://github.com/G
 - [x] String prompt
 - [x] Interactive option selection prompt
 - [x] Confirmation prompt
+- [x] Password prompt
 - [x] Input validation
 - [ ] Advanced support for themes and personalization
 - [ ] Windows support

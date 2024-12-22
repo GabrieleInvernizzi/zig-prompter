@@ -143,4 +143,51 @@ pub const Prompt = struct {
 
         return selected_opt;
     }
+
+    pub fn password(self: *Self, prompt: []const u8, buf: []u8) !?[]const u8 {
+        const stdin = std.io.getStdIn();
+        const out = std.io.getStdOut().writer();
+
+        // Enable terminal raw mode, its very recommended when listening for events
+        var raw_term = try mibu.term.enableRawMode(stdin.handle);
+        defer raw_term.disableRawMode() catch {};
+
+        try out.print("{s}{s} (max length: {d}) {s} ", .{ self.theme.prefix, prompt, buf.len, self.theme.infix });
+
+        var read_count: usize = 0;
+        while (true) {
+            const next = try mibu.events.next(stdin);
+            switch (next) {
+                .key => |k| switch (k) {
+                    .char => |c| {
+                        const c_u8: u8 = @intCast(c);
+                        if (read_count < buf.len) {
+                            buf[read_count] = c_u8;
+                            read_count += 1;
+                            try out.writeAll("*");
+                        }
+                    },
+                    .backspace => {
+                        if (read_count > 0) {
+                            read_count -= 1;
+                            try mibu.cursor.goLeft(out, 1);
+                            try out.writeAll(" ");
+                            try mibu.cursor.goLeft(out, 1);
+                        }
+                    },
+                    .ctrl => |c| switch (c) {
+                        'c' => return null,
+                        else => continue,
+                    },
+                    .enter => break,
+                    else => continue,
+                },
+                else => continue,
+            }
+        }
+
+        try out.writeAll("\n\r");
+
+        return buf[0..read_count];
+    }
 };
