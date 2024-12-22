@@ -42,3 +42,16 @@ test "is_string_empty" {
     try testing.expect(is_string_empty("") == true);
     try testing.expect(is_string_empty("  this shouldn't be empty  ") == false);
 }
+
+test "parse_confirmation" {
+    try testing.expectEqual(true, parse_confirmation("yes"));
+    try testing.expectEqual(true, parse_confirmation("Yes"));
+    try testing.expectEqual(true, parse_confirmation("y"));
+
+    try testing.expectEqual(false, parse_confirmation("no"));
+    try testing.expectEqual(false, parse_confirmation("No"));
+    try testing.expectEqual(false, parse_confirmation("n"));
+
+    try testing.expectError(error.NotConfStr, parse_confirmation("nop"));
+    try testing.expectError(error.NotConfStr, parse_confirmation("yep"));
+}
