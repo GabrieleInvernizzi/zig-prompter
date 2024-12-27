@@ -36,9 +36,9 @@ pub fn main() !void {
     const opts = [_][]const u8{ "Option 1", "Option 2", "Option 3" };
     const sel_opt = try p.option("Select an option", &opts, 1);
     if (sel_opt) |o| {
-        try stdout.writer().print("\nThe selected option was: {s} (idx: {d})\n", .{ opts[o], o });
+        try stdout.writer().print("The selected option was: {s} (idx: {d})\n", .{ opts[o], o });
     } else {
-        try stdout.writer().writeAll("\nThe selection was aborted.\n");
+        try stdout.writer().writeAll("The selection was aborted.\n");
     }
 }
 ```
@@ -56,7 +56,7 @@ For a more exhaustive example, take a look at the [example](https://github.com/G
 - [ ] Windows support
 
 ## Contributions
-For now the project is in its early stages, still contributions are always welcome and greatly appreciated! Whether it's fixing bugs, adding features, improving documentation, or enhancing examples, your input helps make **zig-prompter** even better. Feel free to open issues to discuss potential improvements or submit pull requests directly.
+Contributions are always welcome and greatly appreciated! Whether it's fixing bugs, adding features, improving documentation, or enhancing examples, your input helps make **zig-prompter** even better. Feel free to open issues to discuss potential improvements or submit pull requests directly.
 
 Thank you for your support!
 
