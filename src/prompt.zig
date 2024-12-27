@@ -1,3 +1,5 @@
+//! The main struct of zig-prompter, it manages all the differet kind of prompts.
+
 const std = @import("std");
 const utils = @import("utils.zig");
 const Theme = @import("Themes/Theme.zig");
@@ -8,15 +10,20 @@ const Allocator = std.mem.Allocator;
 const Self = @This();
 
 pub const PromptError = error{DefaultNotInOptions};
+/// Validator Function signature, to be used with `stringValidated`.
 pub const ValidatorFn = fn ([]const u8) bool;
 
 allocator: Allocator,
 theme: Theme,
 
+/// Initialization function.
+/// `theme` must be a valid `Theme` specification.
 pub fn init(allocator: Allocator, theme: Theme) Self {
     return .{ .allocator = allocator, .theme = theme };
 }
 
+/// Asks the user for a string with the provided `prompt`.
+/// If the user does not enter any non whitespace chars the function returns the `default`.
 pub fn string(self: *Self, prompt: []const u8, default: ?[]const u8) ![]const u8 {
     const out = std.io.getStdOut().writer();
     const in = std.io.getStdIn().reader();
@@ -45,6 +52,7 @@ pub fn string(self: *Self, prompt: []const u8, default: ?[]const u8) ![]const u8
     }
 }
 
+/// Similar to `Prompt.string(...)` but it also validate the input with `validator`.
 pub fn stringValidated(self: *Self, prompt: []const u8, default: ?[]const u8, validator: ValidatorFn) ![]const u8 {
     const out = std.io.getStdOut().writer();
 
@@ -59,6 +67,7 @@ pub fn stringValidated(self: *Self, prompt: []const u8, default: ?[]const u8, va
     }
 }
 
+/// Asks the user a confirmation with the `prompt` provided.
 pub fn confirm(self: *Self, prompt: []const u8) !bool {
     const out = std.io.getStdOut().writer();
 
@@ -74,6 +83,8 @@ pub fn confirm(self: *Self, prompt: []const u8) !bool {
     }
 }
 
+/// Asks the user to select an option between `opts` (enter to confirm), then it returns the relative index.
+/// The operation can be aborted using ctrl-c, then the function returns `null`.
 pub fn option(self: *Self, prompt: []const u8, opts: []const []const u8, default: ?usize) !?usize {
     const stdin = std.io.getStdIn();
     const out = std.io.getStdOut().writer();
@@ -139,6 +150,9 @@ pub fn option(self: *Self, prompt: []const u8, opts: []const []const u8, default
     return selected_opt;
 }
 
+/// Asks the user for a password with the provieded `prompt`.
+/// The echoing of an indicator character as the user types can be set via the `Theme`.
+/// The operation can be aborted using ctrl-c, then the function returns `null`.
 pub fn password(self: *Self, prompt: []const u8, buf: []u8) !?[]const u8 {
     const stdin = std.io.getStdIn();
     const out = std.io.getStdOut().writer();
