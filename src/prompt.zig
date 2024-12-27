@@ -1,4 +1,4 @@
-//! The main struct of zig-prompter, it manages all the differet kind of prompts.
+//! The main struct of zig-prompter, it manages all the differet kinds of prompts.
 
 const std = @import("std");
 const utils = @import("utils.zig");

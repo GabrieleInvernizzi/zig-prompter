@@ -23,6 +23,7 @@ const vtable: VTable = .{
 };
 // zig fmt: on
 
+/// String that will be printed between the prompt and the input area.
 infix: []const u8 = ">",
 
 fn format_string_prompt(ptr: *const anyopaque, wrt: Writer, prompt: []const u8, default: ?[]const u8, max_len: ?usize) anyerror!void {
