@@ -30,7 +30,8 @@ pub fn main() !void {
     const allocator = gpa.allocator();
     const stdout = std.io.getStdOut();
 
-    var p = Prompter.Prompt.init(allocator, Prompter.PromptTheme{});
+    const theme = Prompter.Themes.SimpleTheme{};
+    var p = Prompter.Prompt.init(allocator, theme.theme());
 
     const opts = [_][]const u8{ "Option 1", "Option 2", "Option 3" };
     const sel_opt = try p.option("Select an option", &opts, 1);
