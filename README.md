@@ -51,7 +51,8 @@ For a more exhaustive example, take a look at the [example](https://github.com/G
 - [x] Confirmation prompt
 - [x] Password prompt
 - [x] Input validation
-- [ ] Advanced support for themes and personalization
+- [x] Advanced support for themes and personalization
+- [ ] Include more themes
 - [ ] Windows support
 
 ## Contributions
