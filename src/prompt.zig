@@ -1,6 +1,6 @@
 const std = @import("std");
 const utils = @import("utils.zig");
-const PromptTheme = @import("promptTheme.zig").PromptTheme;
+const Theme = @import("Themes/Theme.zig");
 const mibu = @import("mibu");
 
 const Allocator = std.mem.Allocator;
@@ -12,9 +12,9 @@ pub const Prompt = struct {
     pub const ValidatorFn = fn ([]const u8) bool;
 
     allocator: Allocator,
-    theme: PromptTheme,
+    theme: Theme,
 
-    pub fn init(allocator: Allocator, theme: PromptTheme) Self {
+    pub fn init(allocator: Allocator, theme: Theme) Self {
         return Prompt{ .allocator = allocator, .theme = theme };
     }
 
@@ -22,16 +22,12 @@ pub const Prompt = struct {
         const out = std.io.getStdOut().writer();
         const in = std.io.getStdIn().reader();
 
-        if (default) |def| {
-            try out.print("{s}{s} ({s}) {s} ", .{ self.theme.prefix, prompt, def, self.theme.infix });
-        } else {
-            try out.print("{s}{s} {s} ", .{ self.theme.prefix, prompt, self.theme.infix });
-        }
+        try self.theme.format_string_prompt(out, prompt, default, null);
 
         var buf = std.ArrayList(u8).init(self.allocator);
         const buf_writer = buf.writer();
 
-        try in.streamUntilDelimiter(buf_writer, '\n', self.theme.max_input_size);
+        try in.streamUntilDelimiter(buf_writer, '\n', null);
 
         var input: []u8 = try buf.toOwnedSlice();
         if (@import("builtin").os.tag == .windows) {
@@ -70,7 +66,7 @@ pub const Prompt = struct {
         while (true) {
             const str = try self.string(prompt, null);
             const ret = utils.parse_confirmation(str) catch {
-                try out.print("{s}\n", .{self.theme.confirm_invalid_msg});
+                try out.print("{s}\n", .{self.theme.opts.confirm_invalid_msg});
                 self.allocator.free(str);
                 continue;
             };
@@ -83,7 +79,6 @@ pub const Prompt = struct {
         const stdin = std.io.getStdIn();
         const out = std.io.getStdOut().writer();
 
-        // Enable terminal raw mode, its very recommended when listening for events
         var raw_term = try mibu.term.enableRawMode(stdin.handle);
         defer raw_term.disableRawMode() catch {};
 
@@ -96,15 +91,14 @@ pub const Prompt = struct {
         } else {
             selected_opt = 0;
         }
-        try out.print("{s}{s} {s} \n", .{ self.theme.prefix, prompt, self.theme.infix });
+        try self.theme.format_option_prompt(out, prompt);
 
         try mibu.cursor.hide(out);
 
         while (true) {
             for (opts, 0..) |o, i| {
                 try mibu.clear.entire_line(out);
-                const c: u8 = if (i == selected_opt) 'X' else ' ';
-                try out.print("\r[{c}] {s}\n", .{ c, o });
+                try self.theme.format_option_opt(out, o, i == selected_opt);
             }
             try mibu.cursor.goUp(out, opts.len);
 
@@ -135,10 +129,12 @@ pub const Prompt = struct {
         try mibu.clear.screenFromCursor(out);
         try mibu.cursor.show(out);
 
+        try out.writeAll("\r");
+        try self.theme.format_option_prompt(out, prompt);
         if (selected_opt) |o| {
-            try out.print("\r{s}{s} {s} {s}\n\r", .{ self.theme.prefix, prompt, self.theme.infix, opts[o] });
+            try out.print("{s}\n\r", .{opts[o]});
         } else {
-            try out.print("\r{s}{s} {s} {s}\n\r", .{ self.theme.prefix, prompt, self.theme.infix, self.theme.option_aborted_msg });
+            try out.print("{s}\n\r", .{self.theme.opts.option_aborted_msg});
         }
 
         return selected_opt;
@@ -148,11 +144,10 @@ pub const Prompt = struct {
         const stdin = std.io.getStdIn();
         const out = std.io.getStdOut().writer();
 
-        // Enable terminal raw mode, its very recommended when listening for events
         var raw_term = try mibu.term.enableRawMode(stdin.handle);
         defer raw_term.disableRawMode() catch {};
 
-        try out.print("{s}{s} (max length: {d}) {s} ", .{ self.theme.prefix, prompt, buf.len, self.theme.infix });
+        try self.theme.format_passwd_prompt(out, prompt, buf.len);
 
         var read_count: usize = 0;
         while (true) {
@@ -164,15 +159,15 @@ pub const Prompt = struct {
                         if (read_count < buf.len) {
                             buf[read_count] = c_u8;
                             read_count += 1;
-                            if (self.theme.passwd_print_indicator) {
-                                try out.writeAll(&[_]u8{self.theme.passwd_indicator});
+                            if (self.theme.opts.passwd_echo_indicator) {
+                                try out.writeAll(&[_]u8{self.theme.opts.passwd_indicator});
                             }
                         }
                     },
                     .backspace => {
                         if (read_count > 0) {
                             read_count -= 1;
-                            if (self.theme.passwd_print_indicator) {
+                            if (self.theme.opts.passwd_echo_indicator) {
                                 try mibu.cursor.goLeft(out, 1);
                                 try out.writeAll(" ");
                                 try mibu.cursor.goLeft(out, 1);

@@ -15,8 +15,9 @@ pub fn main() !void {
     const allocator = gpa.allocator();
     const out = std.io.getStdOut().writer();
 
-    // Initialize the Prompt struct with the default theme
-    var p = Prompter.Prompt.init(allocator, Prompter.PromptTheme{});
+    // Initialize the Prompt struct with the simple theme
+    const theme = Prompter.Themes.SimpleTheme{};
+    var p = Prompter.Prompt.init(allocator, theme.theme());
 
     // Try out the option selection prompt
     {
