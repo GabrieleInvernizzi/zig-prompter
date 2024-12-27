@@ -1,4 +1,4 @@
-pub const Prompt = @import("prompt.zig").Prompt;
+pub const Prompt = @import("prompt.zig");
 pub const Themes = @import("Themes/Themes.zig");
 
 test {
