@@ -1,6 +1,6 @@
 # zig-prompter
 
-**zig-prompter** is a lightweight and flexible library for building and managing interactive text-based prompts in the [Zig programming language](https://ziglang.org/). Whether you're creating command-line tools, text-based games, or utilities requiring user input, `zig-prompter` simplifies the process with intuitive APIs and a robust feature set.
+**zig-prompter** is a lightweight and flexible library for building and managing interactive text-based prompts in the [Zig programming language](https://ziglang.org/). Whether you're creating command-line tools, text-based games, or utilities requiring user input, **zig-prompter** simplifies the process with intuitive APIs and a robust feature set.
 
 ## Installation
 
