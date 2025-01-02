@@ -24,6 +24,8 @@ pub fn init(allocator: Allocator, theme: Theme) Self {
 
 /// Asks the user for a string with the provided `prompt`.
 /// If the user does not enter any non whitespace chars the function returns the `default`.
+/// In case of success the function will return an owned slice.
+/// Free the return value using the allocator provided in `init`.
 pub fn string(self: *Self, prompt: []const u8, default: ?[]const u8) ![]const u8 {
     const out = std.io.getStdOut().writer();
     const in = std.io.getStdIn().reader();
@@ -53,6 +55,8 @@ pub fn string(self: *Self, prompt: []const u8, default: ?[]const u8) ![]const u8
 }
 
 /// Similar to `Prompt.string(...)` but it also validate the input with `validator`.
+/// In case of success the function will return an owned slice.
+/// Free the return value using the allocator provided in `init`.
 pub fn stringValidated(self: *Self, prompt: []const u8, default: ?[]const u8, validator: ValidatorFn) ![]const u8 {
     const out = std.io.getStdOut().writer();
 
@@ -68,6 +72,8 @@ pub fn stringValidated(self: *Self, prompt: []const u8, default: ?[]const u8, va
 }
 
 /// Asks the user a confirmation with the `prompt` provided.
+/// In case of success the function will return `true` if the value inserted by the user
+/// was affermative and `false` otherwise.
 pub fn confirm(self: *Self, prompt: []const u8) !bool {
     const out = std.io.getStdOut().writer();
 
@@ -153,6 +159,7 @@ pub fn option(self: *Self, prompt: []const u8, opts: []const []const u8, default
 /// Asks the user for a password with the provieded `prompt`.
 /// The echoing of an indicator character as the user types can be set via the `Theme`.
 /// The operation can be aborted using ctrl-c, then the function returns `null`.
+/// In case of success the function will return a slice over `buf`.
 pub fn password(self: *Self, prompt: []const u8, buf: []u8) !?[]const u8 {
     const stdin = std.io.getStdIn();
     const out = std.io.getStdOut().writer();
