@@ -23,6 +23,10 @@ pub const Options = struct {
     passwd_echo_indicator: bool,
     /// The indicator char that will used in the password prompt.
     passwd_indicator: u8,
+    /// Slice of strings that are to be treated by the confirm prompt as affermative (case insensitive).
+    confirm_yes_strings: []const []const u8,
+    /// Slice of strings that are to be treated by the confirm prompt as negative (case insensitive).
+    confirm_no_strings: []const []const u8,
 };
 
 /// Stores all the format functions used in the `Theme` struct.

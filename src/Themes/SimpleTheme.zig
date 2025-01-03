@@ -12,7 +12,9 @@ const opts: Options = .{
     .confirm_invalid_msg = "The only valid values are: y/yes and n/no, case insensitive", 
     .option_aborted_msg = "Selection aborted", 
     .passwd_echo_indicator = true, 
-    .passwd_indicator = '*' 
+    .passwd_indicator = '*',
+    .confirm_yes_strings = &[_][]const u8{"y", "yes"},
+    .confirm_no_strings = &[_][]const u8{"n", "no"},
 };
 
 const vtable: VTable = .{ 

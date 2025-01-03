@@ -77,12 +77,9 @@ pub fn stringValidated(self: *Self, prompt: []const u8, default: ?[]const u8, va
 pub fn confirm(self: *Self, prompt: []const u8) !bool {
     const out = std.io.getStdOut().writer();
 
-    const yes_strings = [_][]const u8{ "y", "yes" };
-    const no_strings = [_][]const u8{ "n", "no" };
-
     while (true) {
         const str = try self.string(prompt, null);
-        const ret = utils.parse_confirmation(str, &yes_strings, &no_strings) catch {
+        const ret = utils.parse_confirmation(str, self.theme.opts.confirm_yes_strings, self.theme.opts.confirm_no_strings) catch {
             try out.print("{s}\n", .{self.theme.opts.confirm_invalid_msg});
             self.allocator.free(str);
             continue;
