@@ -1,27 +1,28 @@
 const std = @import("std");
 
-fn strToLower(str: []u8) []u8 {
-    var i: usize = 0;
-    while (i < str.len) : (i += 1) {
-        str[i] = std.ascii.toLower(str[i]);
-    }
-    return str;
-}
-
-pub fn parse_confirmation(str: []const u8) error{NotConfStr}!bool {
+fn str_eql_case_insensitive(a: []const u8, b: []const u8) bool {
     const toLower = std.ascii.toLower;
 
-    if (str.len == 1) {
-        const c = toLower(str[0]);
-        switch (c) {
-            'y' => return true,
-            'n' => return false,
-            else => return error.NotConfStr,
+    if (a.len != b.len) return false;
+    if (a.len == 0 or a.ptr == b.ptr) return true;
+
+    for (a, b) |a_elem, b_elem| {
+        if (toLower(a_elem) != toLower(b_elem)) return false;
+    }
+    return true;
+}
+
+pub fn parse_confirmation(str: []const u8, yes_strings: []const []const u8, no_strings: []const []const u8) error{NotConfStr}!bool {
+    for (yes_strings) |s| {
+        if (str_eql_case_insensitive(str, s)) {
+            return true;
         }
-    } else if (str.len == 2) {
-        if (toLower(str[0]) == 'n' and toLower(str[1]) == 'o') return false;
-    } else if (str.len == 3) {
-        if (toLower(str[0]) == 'y' and toLower(str[1]) == 'e' and toLower(str[2]) == 's') return true;
+    }
+
+    for (no_strings) |s| {
+        if (str_eql_case_insensitive(str, s)) {
+            return false;
+        }
     }
 
     return error.NotConfStr;
@@ -44,14 +45,22 @@ test "is_string_empty" {
 }
 
 test "parse_confirmation" {
-    try testing.expectEqual(true, parse_confirmation("yes"));
-    try testing.expectEqual(true, parse_confirmation("Yes"));
-    try testing.expectEqual(true, parse_confirmation("y"));
+    const yes_strings = [_][]const u8{ "y", "yes" };
+    const no_strings = [_][]const u8{ "n", "no" };
 
-    try testing.expectEqual(false, parse_confirmation("no"));
-    try testing.expectEqual(false, parse_confirmation("No"));
-    try testing.expectEqual(false, parse_confirmation("n"));
+    const corr_yes_inputs = [_][]const u8{ "yes", "Yes", "y" };
+    const corr_no_inputs = [_][]const u8{ "no", "No", "n" };
+    const wrong_inputs = [_][]const u8{ "yep", "nop" };
 
-    try testing.expectError(error.NotConfStr, parse_confirmation("nop"));
-    try testing.expectError(error.NotConfStr, parse_confirmation("yep"));
+    for (corr_yes_inputs) |i| {
+        try testing.expectEqual(true, parse_confirmation(i, &yes_strings, &no_strings));
+    }
+
+    for (corr_no_inputs) |i| {
+        try testing.expectEqual(false, parse_confirmation(i, &yes_strings, &no_strings));
+    }
+
+    for (wrong_inputs) |i| {
+        try testing.expectError(error.NotConfStr, parse_confirmation(i, &yes_strings, &no_strings));
+    }
 }
