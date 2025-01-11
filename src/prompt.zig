@@ -2,7 +2,10 @@
 
 const std = @import("std");
 const utils = @import("utils.zig");
-const Theme = @import("Themes/Theme.zig");
+const Themes = @import("Themes/Themes.zig");
+const Theme = Themes.Theme;
+const StyledWriter = Themes.StyledWriter;
+
 const mibu = @import("mibu");
 
 const Allocator = std.mem.Allocator;
@@ -29,8 +32,9 @@ pub fn init(allocator: Allocator, theme: Theme) Self {
 pub fn string(self: *Self, prompt: []const u8, default: ?[]const u8) ![]const u8 {
     const out = std.io.getStdOut().writer();
     const in = std.io.getStdIn().reader();
+    const out_styled = utils.styledWriter(out);
 
-    try self.theme.format_string_prompt(out, prompt, default, null);
+    try self.theme.format_string_prompt(out_styled, prompt, default, null);
 
     var buf = std.ArrayList(u8).init(self.allocator);
     const buf_writer = buf.writer();
@@ -94,6 +98,7 @@ pub fn confirm(self: *Self, prompt: []const u8) !bool {
 pub fn option(self: *Self, prompt: []const u8, opts: []const []const u8, default: ?usize) !?usize {
     const stdin = std.io.getStdIn();
     const out = std.io.getStdOut().writer();
+    const out_styled = utils.styledWriter(out);
 
     var raw_term = try mibu.term.enableRawMode(stdin.handle);
     defer raw_term.disableRawMode() catch {};
@@ -107,14 +112,14 @@ pub fn option(self: *Self, prompt: []const u8, opts: []const []const u8, default
     } else {
         selected_opt = 0;
     }
-    try self.theme.format_option_prompt(out, prompt);
+    try self.theme.format_option_prompt(out_styled, prompt);
 
     try mibu.cursor.hide(out);
 
     while (true) {
         for (opts, 0..) |o, i| {
             try mibu.clear.entire_line(out);
-            try self.theme.format_option_opt(out, o, i == selected_opt);
+            try self.theme.format_option_opt(out_styled, o, i == selected_opt);
         }
         try mibu.cursor.goUp(out, opts.len);
 
@@ -146,7 +151,7 @@ pub fn option(self: *Self, prompt: []const u8, opts: []const []const u8, default
     try mibu.cursor.show(out);
 
     try out.writeAll("\r");
-    try self.theme.format_option_prompt(out, prompt);
+    try self.theme.format_option_prompt(out_styled, prompt);
     if (selected_opt) |o| {
         try out.print("{s}\n\r", .{opts[o]});
     } else {
@@ -163,11 +168,12 @@ pub fn option(self: *Self, prompt: []const u8, opts: []const []const u8, default
 pub fn password(self: *Self, prompt: []const u8, buf: []u8) !?[]const u8 {
     const stdin = std.io.getStdIn();
     const out = std.io.getStdOut().writer();
+    const out_styled = utils.styledWriter(out);
 
     var raw_term = try mibu.term.enableRawMode(stdin.handle);
     defer raw_term.disableRawMode() catch {};
 
-    try self.theme.format_passwd_prompt(out, prompt, buf.len);
+    try self.theme.format_passwd_prompt(out_styled, prompt, buf.len);
 
     var read_count: usize = 0;
     while (true) {

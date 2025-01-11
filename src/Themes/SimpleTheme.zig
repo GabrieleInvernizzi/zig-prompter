@@ -1,6 +1,7 @@
 const std = @import("std");
-const Writer = std.fs.File.Writer;
 
+const StyledWriter = @import("StyledWriter.zig");
+const Style = @import("Style.zig");
 const Theme = @import("Theme.zig");
 const Options = Theme.Options;
 const VTable = Theme.VTable;
@@ -28,7 +29,7 @@ const vtable: VTable = .{
 /// String that will be printed between the prompt and the input area.
 infix: []const u8 = ">",
 
-fn format_string_prompt(ptr: *const anyopaque, wrt: Writer, prompt: []const u8, default: ?[]const u8, max_len: ?usize) anyerror!void {
+fn format_string_prompt(ptr: *const anyopaque, wrt: StyledWriter, prompt: []const u8, default: ?[]const u8, max_len: ?usize) anyerror!void {
     _ = max_len;
     const self: *const SimpleTheme = @ptrCast(@alignCast(ptr));
 
@@ -39,16 +40,16 @@ fn format_string_prompt(ptr: *const anyopaque, wrt: Writer, prompt: []const u8, 
     }
 }
 
-fn format_option_prompt(ptr: *const anyopaque, wrt: Writer, prompt: []const u8) anyerror!void {
+fn format_option_prompt(ptr: *const anyopaque, wrt: StyledWriter, prompt: []const u8) anyerror!void {
     try format_string_prompt(ptr, wrt, prompt, null, null);
 }
 
-fn format_option_opt(_: *const anyopaque, wrt: Writer, opt: []const u8, is_selected: bool) anyerror!void {
+fn format_option_opt(_: *const anyopaque, wrt: StyledWriter, opt: []const u8, is_selected: bool) anyerror!void {
     const c: u8 = if (is_selected) 'X' else ' ';
     try wrt.print("\r[{c}] {s}\n", .{ c, opt });
 }
 
-fn format_passwd_prompt(ptr: *const anyopaque, wrt: Writer, prompt: []const u8, max_len: ?usize) anyerror!void {
+fn format_passwd_prompt(ptr: *const anyopaque, wrt: StyledWriter, prompt: []const u8, max_len: ?usize) anyerror!void {
     const self: *const SimpleTheme = @ptrCast(@alignCast(ptr));
 
     if (max_len) |l| {
