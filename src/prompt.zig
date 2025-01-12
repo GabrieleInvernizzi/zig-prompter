@@ -46,16 +46,19 @@ pub fn string(self: *Self, prompt: []const u8, default: ?[]const u8) ![]const u8
         input = std.mem.trimRight(u8, input, "\r");
     }
 
-    const ret = input;
+    var ret: []const u8 = undefined;
 
-    if (utils.is_string_empty(ret) and default != null) {
+    const const_input = input;
+    if (utils.is_string_empty(const_input) and default != null) {
         buf.deinit();
         var out_buf = std.ArrayList(u8).init(self.allocator);
         try out_buf.appendSlice(default.?);
-        return try out_buf.toOwnedSlice();
+        ret = try out_buf.toOwnedSlice();
     } else {
-        return std.mem.trim(u8, ret, &std.ascii.whitespace);
+        ret = std.mem.trim(u8, const_input, &std.ascii.whitespace);
     }
+
+    return ret;
 }
 
 /// Similar to `Prompt.string(...)` but it also validate the input with `validator`.
