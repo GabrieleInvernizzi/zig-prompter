@@ -1,7 +1,5 @@
 const std = @import("std");
 
-const StyledWriter = @import("Themes/StyledWriter.zig");
-
 fn str_eql_case_insensitive(a: []const u8, b: []const u8) bool {
     const toLower = std.ascii.toLower;
 

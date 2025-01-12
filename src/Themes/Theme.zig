@@ -2,7 +2,7 @@
 
 const std = @import("std");
 
-const StyledWriter = @import("StyledWriter.zig");
+const StyledWriter = @import("Style/StyledWriter.zig");
 
 const Theme = @This();
 

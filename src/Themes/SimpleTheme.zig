@@ -1,7 +1,7 @@
 const std = @import("std");
 
-const StyledWriter = @import("StyledWriter.zig");
-const Style = @import("Style.zig");
+const StyledWriter = @import("Style/StyledWriter.zig");
+const Style = @import("Style/Style.zig");
 const Theme = @import("Theme.zig");
 const Options = Theme.Options;
 const VTable = Theme.VTable;
