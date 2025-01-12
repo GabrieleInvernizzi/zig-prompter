@@ -48,3 +48,9 @@ pub fn print(self: Self, comptime format: []const u8, args: anytype) !void {
         try mibu.color.resetAll(self.writer);
     }
 }
+
+pub fn styledWriter(wrt: Writer) Self {
+    return .{
+        .writer = wrt,
+    };
+}

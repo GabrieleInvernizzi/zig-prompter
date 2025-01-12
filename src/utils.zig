@@ -38,12 +38,6 @@ pub fn is_string_empty(str: []const u8) bool {
     return true;
 }
 
-pub fn styledWriter(wrt: StyledWriter.Writer) StyledWriter {
-    return .{
-        .writer = wrt,
-    };
-}
-
 const testing = std.testing;
 
 test "is_string_empty" {

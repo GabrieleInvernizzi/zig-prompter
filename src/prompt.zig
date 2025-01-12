@@ -32,7 +32,7 @@ pub fn init(allocator: Allocator, theme: Theme) Self {
 pub fn string(self: *Self, prompt: []const u8, default: ?[]const u8) ![]const u8 {
     const out = std.io.getStdOut().writer();
     const in = std.io.getStdIn().reader();
-    const out_styled = utils.styledWriter(out);
+    const out_styled = StyledWriter.styledWriter(out);
 
     try self.theme.format_string_prompt(out_styled, prompt, default, null);
 
@@ -98,7 +98,7 @@ pub fn confirm(self: *Self, prompt: []const u8) !bool {
 pub fn option(self: *Self, prompt: []const u8, opts: []const []const u8, default: ?usize) !?usize {
     const stdin = std.io.getStdIn();
     const out = std.io.getStdOut().writer();
-    const out_styled = utils.styledWriter(out);
+    const out_styled = StyledWriter.styledWriter(out);
 
     var raw_term = try mibu.term.enableRawMode(stdin.handle);
     defer raw_term.disableRawMode() catch {};
@@ -168,7 +168,7 @@ pub fn option(self: *Self, prompt: []const u8, opts: []const []const u8, default
 pub fn password(self: *Self, prompt: []const u8, buf: []u8) !?[]const u8 {
     const stdin = std.io.getStdIn();
     const out = std.io.getStdOut().writer();
-    const out_styled = utils.styledWriter(out);
+    const out_styled = StyledWriter.styledWriter(out);
 
     var raw_term = try mibu.term.enableRawMode(stdin.handle);
     defer raw_term.disableRawMode() catch {};
