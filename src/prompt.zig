@@ -150,6 +150,7 @@ pub fn option(self: *Self, prompt: []const u8, opts: []const []const u8, default
                     'k' => if (selected_opt.? > 0) {
                         selected_opt.? -= 1;
                     },
+                    else => continue,
                 },
                 else => continue,
             },
