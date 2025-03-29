@@ -139,16 +139,18 @@ pub fn option(self: *Self, prompt: []const u8, opts: []const []const u8, default
                 .down => if (selected_opt.? < (opts.len - 1)) {
                     selected_opt.? += 1;
                 },
-                .j => if (selected_opt.? < (opts.len - 1)) {
-                    selected_opt.? += 1;
-                },
                 .up => if (selected_opt.? > 0) {
                     selected_opt.? -= 1;
                 },
-                .k => if (selected_opt.? > 0) {
-                    selected_opt.? -= 1;
-                },
                 .enter => break,
+                .char => |c| switch (c) {
+                    'j' => if (selected_opt.? < (opts.len - 1)) {
+                        selected_opt.? += 1;
+                    },
+                    'k' => if (selected_opt.? > 0) {
+                        selected_opt.? -= 1;
+                    },
+                },
                 else => continue,
             },
             else => continue,
