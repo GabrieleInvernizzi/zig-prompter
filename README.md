@@ -1,3 +1,5 @@
+# this is a fork of https://github.com/GabrieleInvernizzi/zig-prompter with support for j/k navigation
+
 # zig-prompter
 
 **zig-prompter** is a lightweight and flexible library for building and managing interactive text-based prompts in the [Zig programming language](https://ziglang.org/). Whether you're creating command-line tools, text-based games, or utilities requiring user input, **zig-prompter** simplifies the process with intuitive APIs and a robust feature set.
@@ -6,7 +8,7 @@
 
 First, add zig-prompter to your `build.zig.zon` file:
 ```bash
-zig fetch --save git+https://github.com/GabrieleInvernizzi/zig-prompter/
+zig fetch --save git+https://github.com/davidprokopec/zig-prompter/
 ```
 
 Update your `build.zig` file to include the dependency:
@@ -44,6 +46,7 @@ pub fn main() !void {
 ```
 
 For a more exhaustive example, take a look at the [example](https://github.com/GabrieleInvernizzi/zig-prompter/tree/main/example) directory.
+I will try to keep the fork in sync with original
 
 ## Features
 - [x] String prompt
