@@ -1,7 +1,8 @@
 .{
-    .name = "prompter",
+    .name = .prompter,
     .version = "0.1.0",
-    //.minimum_zig_version = "0.11.0",
+    .fingerprint = 0xb4c36e6a6668a74f,
+    .minimum_zig_version = "0.14.0",
     .dependencies = .{
         .mibu = .{
             .url = "git+https://github.com/xyaman/mibu#b001662c929e2719ee24be585a3120640f946337",
